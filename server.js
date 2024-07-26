@@ -140,3 +140,5 @@ data.initialize().then(() => {
 }).catch((err) => {
     console.log("unable to start server: " + err);
 });
+
+module.exports = app
