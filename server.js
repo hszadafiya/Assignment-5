@@ -142,109 +142,127 @@ data.initialize().then(() => {
 });
 
 module.exports = app **/
-const express = require('express');
-const exphbs = require('express-handlebars');
-const fs = require('fs');
-const path = require('path');
+const express = require("express");
+const path = require("path");
+const exphbs = require("express-handlebars");
+const data = require("./modules/collegeData.js");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const HTTP_PORT = process.env.PORT || 8080;
 
-app.engine('hbs', exphbs({ extname: '.hbs' }));
-app.set('view engine', 'hbs');
-
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
-
-const readData = (file) => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(file, 'utf8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(JSON.parse(data));
-      }
-    });
-  });
-};
-
-app.get('/', (req, res) => {
-  res.render('home');
-});
-
-app.get('/students', async (req, res) => {
-  try {
-    const students = await readData('./data/students.json');
-    res.render('students', { students });
-  } catch (err) {
-    res.status(500).send('Error reading students data');
-  }
-});
-
-app.get('/student/:studentNum', async (req, res) => {
-  try {
-    const students = await readData('./data/students.json');
-    const student = students.find(s => s.studentNum == req.params.studentNum);
-    if (student) {
-      res.render('student', { student });
-    } else {
-      res.status(404).send('Student not found');
-    }
-  } catch (err) {
-    res.status(500).send('Error reading student data');
-  }
-});
-
-app.post('/student/update', async (req, res) => {
-  try {
-    const students = await readData('./data/students.json');
-    const studentIndex = students.findIndex(s => s.studentNum == req.body.studentNum);
-    if (studentIndex !== -1) {
-      students[studentIndex] = { ...students[studentIndex], ...req.body };
-      fs.writeFile('./data/students.json', JSON.stringify(students, null, 2), (err) => {
-        if (err) {
-          res.status(500).send('Error saving student data');
-        } else {
-          res.redirect(`/student/${req.body.studentNum}`);
+app.engine('.hbs', exphbs.engine({
+    defaultLayout: 'main',
+    extname: '.hbs',
+    helpers: {
+        navLink: function(url, options) {
+            return '<li' +
+                ((url == app.locals.activeRoute) ? ' class="nav-item active"' : ' class="nav-item"') +
+                '><a class="nav-link" href="' + url + '">' + options.fn(this) + '</a></li>';
+        },
+        equal: function(lvalue, rvalue, options) {
+            if (arguments.length < 3)
+                throw new Error("Handlebars Helper equal needs 2 parameters");
+            if (lvalue != rvalue) {
+                return options.inverse(this);
+            } else {
+                return options.fn(this);
+            }
         }
-      });
-    } else {
-      res.status(404).send('Student not found');
     }
-  } catch (err) {
-    res.status(500).send('Error updating student data');
-  }
+}));
+
+app.set('view engine', '.hbs');
+
+app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }));
+
+app.use((req, res, next) => {
+    let route = req.path.substring(1);
+    app.locals.activeRoute = "/" + (isNaN(route.split('/')[1]) ? route.replace(/\/(?!.*)/, "") : route.replace(/\/(.*)/, ""));
+    next();
 });
 
-app.get('/courses', async (req, res) => {
-  try {
-    const courses = await readData('./data/courses.json');
-    res.render('courses', { courses });
-  } catch (err) {
-    res.status(500).send('Error reading courses data');
-  }
+// Routes
+app.get("/", (req, res) => {
+    res.render("home");
 });
 
-app.get('/course/:id', async (req, res) => {
-  try {
-    const courses = await readData('./data/courses.json');
-    const course = courses.find(c => c.courseId == req.params.id);
-    if (course) {
-      res.render('course', { course });
+app.get("/about", (req, res) => {
+    res.render("about");
+});
+
+app.get("/htmlDemo", (req, res) => {
+    res.render("htmlDemo");
+});
+
+app.get("/students", (req, res) => {
+    if (req.query.course) {
+        data.getStudentsByCourse(req.query.course).then((data) => {
+            res.render("students", { students: data });
+        }).catch((err) => {
+            res.render("students", { message: "no results" });
+        });
     } else {
-      res.status(404).send('Course not found');
+        data.getAllStudents().then((data) => {
+            res.render("students", { students: data });
+        }).catch((err) => {
+            res.render("students", { message: "no results" });
+        });
     }
-  } catch (err) {
-    res.status(500).send('Error reading course data');
-  }
+});
+
+app.get("/students/add", (req, res) => {
+    res.render("addStudent");
+});
+
+app.post("/students/add", (req, res) => {
+    data.addStudent(req.body).then(() => {
+        res.redirect("/students");
+    }).catch((err) => {
+        res.status(500).send("Unable to add student");
+    });
+});
+
+app.get("/student/:studentNum", (req, res) => {
+    data.getStudentByNum(req.params.studentNum).then((data) => {
+        res.render("student", { student: data });
+    }).catch((err) => {
+        res.render("student", { message: "no results" });
+    });
+});
+
+app.post("/student/update", (req, res) => {
+    data.updateStudent(req.body).then(() => {
+        res.redirect("/students");
+    }).catch((err) => {
+        res.status(500).send("Unable to update student");
+    });
+});
+
+app.get("/courses", (req, res) => {
+    data.getCourses().then((data) => {
+        res.render("courses", { courses: data });
+    }).catch((err) => {
+        res.render("courses", { message: "no results" });
+    });
+});
+
+app.get("/course/:id", (req, res) => {
+    data.getCourseById(req.params.id).then((data) => {
+        res.render("course", { course: data });
+    }).catch((err) => {
+        res.render("course", { message: "no results" });
+    });
 });
 
 app.use((req, res) => {
-  res.status(404).send('Page not found');
+    res.status(404).send("Page Not Found");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+data.initialize().then(() => {
+    app.listen(HTTP_PORT, () => {
+        console.log("app listening on: " + HTTP_PORT);
+    });
+}).catch((err) => {
+    console.log("unable to start server: " + err);
 });
