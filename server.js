@@ -143,9 +143,9 @@ data.initialize().then(() => {
 
 module.exports = app **/
 const express = require('express');
-const path = require('path');
 const exphbs = require('express-handlebars');
 const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -153,14 +153,11 @@ const PORT = process.env.PORT || 3000;
 app.engine('hbs', exphbs({ extname: '.hbs' }));
 app.set('view engine', 'hbs');
 
-// Middleware to parse JSON and URL-encoded data
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Function to read JSON data
 const readData = (file) => {
   return new Promise((resolve, reject) => {
     fs.readFile(file, 'utf8', (err, data) => {
@@ -173,12 +170,10 @@ const readData = (file) => {
   });
 };
 
-// Home route
 app.get('/', (req, res) => {
   res.render('home');
 });
 
-// Students route
 app.get('/students', async (req, res) => {
   try {
     const students = await readData('./data/students.json');
@@ -188,7 +183,6 @@ app.get('/students', async (req, res) => {
   }
 });
 
-// Student details route
 app.get('/student/:studentNum', async (req, res) => {
   try {
     const students = await readData('./data/students.json');
@@ -203,7 +197,6 @@ app.get('/student/:studentNum', async (req, res) => {
   }
 });
 
-// Update student route
 app.post('/student/update', async (req, res) => {
   try {
     const students = await readData('./data/students.json');
@@ -225,7 +218,6 @@ app.post('/student/update', async (req, res) => {
   }
 });
 
-// Courses route
 app.get('/courses', async (req, res) => {
   try {
     const courses = await readData('./data/courses.json');
@@ -235,7 +227,6 @@ app.get('/courses', async (req, res) => {
   }
 });
 
-// Course details route
 app.get('/course/:id', async (req, res) => {
   try {
     const courses = await readData('./data/courses.json');
@@ -250,7 +241,6 @@ app.get('/course/:id', async (req, res) => {
   }
 });
 
-// 404 route
 app.use((req, res) => {
   res.status(404).send('Page not found');
 });
