@@ -129,6 +129,8 @@ const initialize = () => {
         try {
             students = JSON.parse(fs.readFileSync(studentsPath, 'utf-8'));
             courses = JSON.parse(fs.readFileSync(coursesPath, 'utf-8'));
+            console.log('Students:', students);
+            console.log('Courses:', courses);
             resolve();
         } catch (err) {
             reject("Unable to read data files");
