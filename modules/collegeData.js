@@ -211,7 +211,7 @@ const getCourses = () => {
 // Get a course by course ID
 const getCourseById = (courseId) => {
     return new Promise((resolve, reject) => {
-        const course = courses.find(course => course.courseCode == courseId);
+        const course = courses.find(course => course.courseId == courseId);
         if (course) {
             resolve(course);
         } else {
