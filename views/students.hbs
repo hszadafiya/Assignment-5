@@ -1,4 +1,4 @@
-{{!--<div class="row">
+<div class="row">
     
     <div class="col-md-12">
         <br>
@@ -37,48 +37,3 @@
     </div>
     {{/unless}}
 </div> 
---}}
-<div class="container">
-    <h2>Students</h2>
-    <form action="/students" method="get">
-        <label for="course">Filter by Course:</label>
-        <select name="course" id="course">
-            <option value="">All</option>
-            {{#each courses}}
-            <option value="{{this.courseId}}">{{this.courseCode}} - {{this.courseDescription}}</option>
-            {{/each}}
-        </select>
-        <button type="submit">Filter</button>
-    </form>
-
-    {{#if students.length}}
-    <table>
-        <thead>
-            <tr>
-                <th>Student Number</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Course</th>
-                <th>TA</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each students}}
-            <tr>
-                <td><a href="/student/{{this.studentNum}}">{{this.studentNum}}</a></td>
-                <td>{{this.firstName}}</td>
-                <td>{{this.lastName}}</td>
-                <td>{{this.email}}</td>
-                <td>{{this.course}}</td>
-                <td>{{this.TA}}</td>
-                <td>{{this.status}}</td>
-            </tr>
-            {{/each}}
-        </tbody>
-    </table>
-    {{else}}
-    <p>No students found</p>
-    {{/if}}
-</div>

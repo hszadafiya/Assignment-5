@@ -1,4 +1,4 @@
-{{!--<div class="row">
+<div class="row">
     <main class="col-md-12">
         <br>
         <h2>{{student.firstName}} {{student.lastName}} - Student: {{student.studentNum}}</h2>
@@ -113,35 +113,4 @@
 
         </form>
     </main>
-</div>--}}
-<div class="container">
-    <h2>Student Details</h2>
-    {{#if student}}
-    <form action="/student/update" method="post">
-        <label for="studentNum">Student Number:</label>
-        <input type="text" name="studentNum" value="{{student.studentNum}}" readonly>
-
-        <label for="firstName">First Name:</label>
-        <input type="text" name="firstName" value="{{student.firstName}}">
-
-        <label for="lastName">Last Name:</label>
-        <input type="text" name="lastName" value="{{student.lastName}}">
-
-        <label for="email">Email:</label>
-        <input type="text" name="email" value="{{student.email}}">
-
-        <label for="course">Course:</label>
-        <input type="text" name="course" value="{{student.course}}">
-
-        <label for="TA">TA:</label>
-        <input type="text" name="TA" value="{{student.TA}}">
-
-        <label for="status">Status:</label>
-        <input type="text" name="status" value="{{student.status}}">
-
-        <button type="submit">Update</button>
-    </form>
-    {{else}}
-    <p>No student details found</p>
-    {{/if}}
 </div>
