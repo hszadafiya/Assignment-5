@@ -142,15 +142,16 @@ data.initialize().then(() => {
 });
 
 module.exports = app 
-*/
+**/
+
 /*********************************************************************************
 *  WEB700 – Assignment 05
-*  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part 
+*  I declare that this assignment is my own work in accordance with Seneca Academic Policy. No part 
 *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
 * Name: Heet Zadafiya
-* Student ID: 140255233  Date: 26 Jun 2024
+* Student ID: 140255233 Date: 26 Jun 2024
 *
 * Online (vercel) Link: 
 *
@@ -169,12 +170,12 @@ app.engine('.hbs', exphbs.engine({
     defaultLayout: 'main',
     extname: '.hbs',
     helpers: {
-        navLink: function(url, options) {
+        navLink: function (url, options) {
             return '<li' +
                 ((url == app.locals.activeRoute) ? ' class="nav-item active"' : ' class="nav-item"') +
                 '><a class="nav-link" href="' + url + '">' + options.fn(this) + '</a></li>';
         },
-        equal: function(lvalue, rvalue, options) {
+        equal: function (lvalue, rvalue, options) {
             if (arguments.length < 3)
                 throw new Error("Handlebars Helper equal needs 2 parameters");
             if (lvalue != rvalue) {

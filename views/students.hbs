@@ -47,8 +47,8 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Student Num</th>
-                        <th>Full Name</th>
+                        <th>Student&nbsp;Num</th>
+                        <th>Full&nbsp;Name</th>
                         <th>Email</th>
                         <th>Address</th>
                         <th>Status</th>
@@ -68,11 +68,13 @@
                     {{/each}}
                 </tbody>
             </table>
+            {{#if students.length}}
+            {{else}}
+                <p class="text-danger">No Results</p>
+            {{/if}}
         </div>
+        <br />
+        <a href="/students/add" class="btn btn-success">Add Student</a>
+        <br /><br />
     </div>
-    {{#unless students}}
-    <div class="col-md-12 text-center">
-        <strong>{{message}}</strong>
-    </div>
-    {{/unless}}
 </div>

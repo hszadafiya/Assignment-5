@@ -114,7 +114,7 @@ module.exports.addStudent = function (studentData) {
 
 }; 
 **/
-const fs = require('fs');
+const fs = require("fs");
 
 let students = [];
 let courses = [];
@@ -122,17 +122,11 @@ let courses = [];
 function initialize() {
     return new Promise((resolve, reject) => {
         try {
-            fs.readFile('./data/students.json', (err, data) => {
-                if (err) throw err;
-                students = JSON.parse(data);
-            });
-            fs.readFile('./data/courses.json', (err, data) => {
-                if (err) throw err;
-                courses = JSON.parse(data);
-            });
+            students = JSON.parse(fs.readFileSync("./Data/students.json"));
+            courses = JSON.parse(fs.readFileSync("./Data/courses.json"));
             resolve();
         } catch (err) {
-            reject("Unable to read files");
+            reject("Unable to read the data files");
         }
     });
 }
@@ -151,9 +145,40 @@ function getStudentsByCourse(course) {
     return new Promise((resolve, reject) => {
         const filteredStudents = students.filter(student => student.course == course);
         if (filteredStudents.length === 0) {
-            reject("No students found for this course");
+            reject("No students found for the given course");
         } else {
             resolve(filteredStudents);
+        }
+    });
+}
+
+function getStudentByNum(num) {
+    return new Promise((resolve, reject) => {
+        const student = students.find(student => student.studentNum == num);
+        if (student) {
+            resolve(student);
+        } else {
+            reject("No student found for the given student number");
+        }
+    });
+}
+
+function addStudent(studentData) {
+    return new Promise((resolve, reject) => {
+        studentData.studentNum = students.length + 1;
+        students.push(studentData);
+        resolve();
+    });
+}
+
+function updateStudent(studentData) {
+    return new Promise((resolve, reject) => {
+        const studentIndex = students.findIndex(student => student.studentNum == studentData.studentNum);
+        if (studentIndex !== -1) {
+            students[studentIndex] = studentData;
+            resolve();
+        } else {
+            reject("No student found for the given student number");
         }
     });
 }
@@ -171,41 +196,10 @@ function getCourses() {
 function getCourseById(id) {
     return new Promise((resolve, reject) => {
         const course = courses.find(course => course.courseId == id);
-        if (!course) {
-            reject("No course found");
-        } else {
+        if (course) {
             resolve(course);
-        }
-    });
-}
-
-function addStudent(student) {
-    return new Promise((resolve, reject) => {
-        students.push(student);
-        fs.writeFile('./data/students.json', JSON.stringify(students, null, 2), (err) => {
-            if (err) {
-                reject("Unable to add student");
-            } else {
-                resolve();
-            }
-        });
-    });
-}
-
-function updateStudent(student) {
-    return new Promise((resolve, reject) => {
-        const index = students.findIndex(s => s.studentNum == student.studentNum);
-        if (index !== -1) {
-            students[index] = student;
-            fs.writeFile('./data/students.json', JSON.stringify(students, null, 2), (err) => {
-                if (err) {
-                    reject("Unable to update student");
-                } else {
-                    resolve();
-                }
-            });
         } else {
-            reject("Student not found");
+            reject("No course found for the given course ID");
         }
     });
 }
@@ -214,8 +208,9 @@ module.exports = {
     initialize,
     getAllStudents,
     getStudentsByCourse,
-    getCourses,
-    getCourseById,
+    getStudentByNum,
     addStudent,
-    updateStudent
+    updateStudent,
+    getCourses,
+    getCourseById
 };
